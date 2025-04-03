@@ -1,0 +1,3 @@
+C:\Users\pc\Documents\IMAC\Prog_Algo_IMAC\mingw64\bin\cmake.exe -E rm -f CMakeFiles\TD01_ex02.dir/objects.a
+C:\Users\pc\Documents\IMAC\Prog_Algo_IMAC\mingw64\bin\ar.exe qc CMakeFiles\TD01_ex02.dir/objects.a @CMakeFiles\TD01_ex02.dir\objects1.rsp
+C:\Users\pc\Documents\IMAC\Prog_Algo_IMAC\mingw64\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\TD01_ex02.dir/objects.a -Wl,--no-whole-archive -o C:\Users\pc\Documents\IMAC\Synthese_image\TD_GL\TD01\bin\TD01_ex02.exe -Wl,--out-implib,libTD01_ex02.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\TD01_ex02.dir\linkLibs.rsp

@@ -1,0 +1,20 @@
+[
+{
+  "directory": "C:/Users/pc/Documents/IMAC/Synthese_image/TD_GL/TD01/build",
+  "command": "C:\\Users\\pc\\Documents\\IMAC\\Prog_Algo_IMAC\\mingw64\\bin\\g++.exe   -g -std=c++11 -Wall -Wextra -o CMakeFiles\\TD01_ex02.dir\\ex02.obj -c C:\\Users\\pc\\Documents\\IMAC\\Synthese_image\\TD_GL\\TD01\\ex02.cpp",
+  "file": "C:/Users/pc/Documents/IMAC/Synthese_image/TD_GL/TD01/ex02.cpp",
+  "output": "CMakeFiles/TD01_ex02.dir/ex02.obj"
+},
+{
+  "directory": "C:/Users/pc/Documents/IMAC/Synthese_image/TD_GL/TD01/build",
+  "command": "C:\\Users\\pc\\Documents\\IMAC\\Prog_Algo_IMAC\\mingw64\\bin\\g++.exe   -g -std=c++11 -Wall -Wextra -o CMakeFiles\\TD01_ex03.dir\\ex03.obj -c C:\\Users\\pc\\Documents\\IMAC\\Synthese_image\\TD_GL\\TD01\\ex03.cpp",
+  "file": "C:/Users/pc/Documents/IMAC/Synthese_image/TD_GL/TD01/ex03.cpp",
+  "output": "CMakeFiles/TD01_ex03.dir/ex03.obj"
+},
+{
+  "directory": "C:/Users/pc/Documents/IMAC/Synthese_image/TD_GL/TD01/build",
+  "command": "C:\\Users\\pc\\Documents\\IMAC\\Prog_Algo_IMAC\\mingw64\\bin\\g++.exe   -g -std=c++11 -Wall -Wextra -o CMakeFiles\\TD01_ex04.dir\\ex04.obj -c C:\\Users\\pc\\Documents\\IMAC\\Synthese_image\\TD_GL\\TD01\\ex04.cpp",
+  "file": "C:/Users/pc/Documents/IMAC/Synthese_image/TD_GL/TD01/ex04.cpp",
+  "output": "CMakeFiles/TD01_ex04.dir/ex04.obj"
+}
+]
