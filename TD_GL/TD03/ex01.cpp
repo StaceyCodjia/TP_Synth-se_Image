@@ -1,0 +1,181 @@
+#define GLFW_INCLUDE_NONE
+#include "GLFW/glfw3.h"
+#include "glad/glad.h"
+#include "glbasimac/glbi_engine.hpp"
+#include "glbasimac/glbi_set_of_points.hpp"
+#include <iostream>
+#include "glbasimac/glbi_convex_2d_shape.hpp"
+
+using namespace glbasimac;
+
+/* Minimal time wanted between two images */
+static const double FRAMERATE_IN_SECONDS = 1. / 30.;
+static float aspectRatio = 1.0f;
+
+/* OpenGL Engine */
+GLBI_Engine myEngine;
+
+/* Error handling function */
+void onError(int error, const char* description) {
+	std::cout << "GLFW Error ("<<error<<") : " << description << std::endl;
+}
+
+// GLBI_Convex_2D_Shape carre;
+GLBI_Convex_2D_Shape cercle;
+GLBI_Convex_2D_Shape trapeze;
+
+static const float GL_VIEW_SIZE = 4.;
+
+void onWindowResized(GLFWwindow* /*window*/, int width, int height){
+
+ 	aspectRatio = width / (float) height;
+ 	glViewport(0, 0, width, height);
+ 	if( aspectRatio > 1.0){
+		myEngine.set2DProjection(-GL_VIEW_SIZE * aspectRatio/ 2.,
+ 		GL_VIEW_SIZE * aspectRatio / 2. ,
+		-GL_VIEW_SIZE / 2., GL_VIEW_SIZE / 2.);
+ }
+ 	else{
+		myEngine.set2DProjection(-GL_VIEW_SIZE / 2., GL_VIEW_SIZE / 2.,
+ 		-GL_VIEW_SIZE / (2. * aspectRatio), 
+		GL_VIEW_SIZE / (2. * aspectRatio));
+ }
+ }
+
+ void initScene(){
+
+	std::vector<float> trapezeCoordinates = {
+        -0.3f, -0.5f,  
+         0.3f, -0.5f,  
+         0.2f,  0.5f,  
+        -0.2f,  0.5f   
+    };
+    trapeze.initShape(trapezeCoordinates);
+
+	// std::vector<float> carreCoordonnes = {
+	// 	-0.5f, -0.5f,
+	// 	0.5f, -0.5f,
+	// 	0.5f, 0.5f,
+	// 	-0.5f, 0.5f
+	// };
+	// carre.initShape(carreCoordonnes);
+
+	std::vector<float> cercleCoordinates;
+    int numSegments = 50; 
+    float angleStep = 2.0f * M_PI / numSegments;
+    for (int i = 0; i < numSegments; ++i) {
+        float angle = i * angleStep;
+        float x = cos(angle);
+        float y = sin(angle);
+        cercleCoordinates.push_back(x);
+        cercleCoordinates.push_back(y);
+    }
+	cercle.initShape(cercleCoordinates);
+}
+ 
+void drawFirstArm(){
+	myEngine.setFlatColor(1.0f, 1.0f, 1.0f);
+	myEngine.mvMatrixStack.pushMatrix();
+	myEngine.mvMatrixStack.addTranslation(Vector3D(-0.3f, 0.0f, 0.0f));
+	glScalef(0.2f, 0.2f, 1.0f);
+	cercle.drawShape();
+	myEngine.mvMatrixStack.popMatrix();
+
+	myEngine.setFlatColor(1.0f, 1.0f, 1.0f); 
+    myEngine.mvMatrixStack.pushMatrix(); 
+	myEngine.mvMatrixStack.addRotation(90.0f, Vector3D(1.0f, 0.0f, 0.0f));
+    trapeze.drawShape();
+    myEngine.mvMatrixStack.popMatrix();
+
+	myEngine.setFlatColor(1.0f, 1.0f, 1.0f); 
+    myEngine.mvMatrixStack.pushMatrix();
+    myEngine.mvMatrixStack.addTranslation(Vector3D(0.3f, 0.0f, 0.0f));
+    glScalef(0.1f, 0.1f, 1.0f); 
+    cercle.drawShape();
+    myEngine.mvMatrixStack.popMatrix();
+}
+
+ void renderScene(){
+			// myEngine.setFlatColor(1.0f, 0.0f, 0.0f);
+			// myEngine.mvMatrixStack.pushMatrix();
+			// glScalef(1.0f, 1.0f, 1.0f);
+			// carre.drawShape();
+			// myEngine.mvMatrixStack.popMatrix();
+		drawFirstArm();
+			
+ }
+ 
+//  void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+//  {
+// 	 const char* keyName = glfwGetKeyName(key, scancode);
+ 
+// 	 if (action == GLFW_PRESS && keyName[0] == 'a') {
+// 		 objectNumber = (objectNumber+1)%3;
+// 	 }
+//  }
+
+int main() {
+    // Initialize the library
+    if (!glfwInit()) {
+        return -1;
+    }
+
+    /* Callback to a function if an error is rised by GLFW */
+	glfwSetErrorCallback(onError);
+
+    // Create a windowed mode window and its OpenGL context
+    GLFWwindow* window = glfwCreateWindow(800, 800, "TD 03 Ex 1", nullptr, nullptr);
+    if (!window) {
+        glfwTerminate();
+        return -1;
+    }
+	glfwSetWindowSizeCallback (window,onWindowResized);
+	
+
+    // Make the window's context current
+    glfwMakeContextCurrent(window);
+
+	// Intialize glad (loads the OpenGL functions)
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		return -1;
+	}
+
+	// Initialize Rendering Engine
+	myEngine.initGL();
+	onWindowResized(window,800, 800);
+	//glfwSetKeyCallback(window, key_callback);
+	initScene();
+	
+
+	/* Loop until the user closes the window */
+	while (!glfwWindowShouldClose(window))
+	{
+		/* Get time (in second) at loop beginning */
+		double startTime = glfwGetTime();
+
+		/* Render here */
+		glClearColor(0.2f,0.f,0.f,0.f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		renderScene();
+
+        // render here
+
+		/* Swap front and back buffers */
+		glfwSwapBuffers(window);
+
+		/* Poll for and process events */
+		glfwPollEvents();
+
+		/* Elapsed time computation from loop begining */
+		double elapsedTime = glfwGetTime() - startTime;
+		/* If to few time is spend vs our wanted FPS, we wait */
+		while(elapsedTime < FRAMERATE_IN_SECONDS)
+		{
+			glfwWaitEventsTimeout(FRAMERATE_IN_SECONDS-elapsedTime);
+			elapsedTime = glfwGetTime() - startTime;
+		}
+	}
+
+    glfwTerminate();
+    return 0;
+}
