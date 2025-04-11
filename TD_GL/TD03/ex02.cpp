@@ -13,11 +13,11 @@ static const double FRAMERATE_IN_SECONDS = 1. / 30.;
 static float aspectRatio = 1.0f;
 
 /* Espace virtuel */
-static const float GL_VIEW_SIZE = 100.0;
+static const float GL_VIEW_SIZE = 200.0;
 
 /* OpenGL Engine */
 GLBI_Engine myEngine;
-//GLBI_Set_Of_Points thePoints;
+GLBI_Set_Of_Points thePoints;
 GLBI_Convex_2D_Shape carre;
 GLBI_Convex_2D_Shape triangle;
 GLBI_Convex_2D_Shape cercle;
@@ -28,6 +28,8 @@ int objectNumber = 0;
 float alpha = M_PI/4;
 float beta = -M_PI/3;
 float gamma = 7*M_PI/36;
+
+float alphaSpeed = 0.01f;
 
 /* Error handling function */
 void onError(int error, const char *description)
@@ -82,33 +84,28 @@ void initScene() {
 }
 
 void drawFirstArm() {
-    myEngine.setFlatColor(1.f, 1.f, 1.f);
+    myEngine.mvMatrixStack.pushMatrix();
+        myEngine.mvMatrixStack.addHomothety({ 20.f, 20.f, 1.f });
+        myEngine.updateMvMatrix();
+        cercle.changeNature(GL_TRIANGLE_FAN);
+        cercle.drawShape();
+    myEngine.mvMatrixStack.popMatrix();
 
     myEngine.mvMatrixStack.pushMatrix();
-        myEngine.mvMatrixStack.addTranslation({ -20.f, 0.f, 0.f });
+        myEngine.mvMatrixStack.addRotation(-M_PI/2, { 0.f, 0.f, 1.f });
+        myEngine.mvMatrixStack.addTranslation({ 0.f, 30.f, 0.f });
+        myEngine.mvMatrixStack.addHomothety({ 40.f, 60.f, 0.f });
+        myEngine.updateMvMatrix();  
+        trapeze.changeNature(GL_TRIANGLE_FAN);
+        trapeze.drawShape();
+    myEngine.mvMatrixStack.popMatrix();
 
-        myEngine.mvMatrixStack.pushMatrix();
-            myEngine.mvMatrixStack.addHomothety({ 20.f, 20.f, 1.f });
-            myEngine.updateMvMatrix();
-            cercle.changeNature(GL_TRIANGLE_FAN);
-            cercle.drawShape();
-        myEngine.mvMatrixStack.popMatrix();
-
-        myEngine.mvMatrixStack.pushMatrix();
-            myEngine.mvMatrixStack.addRotation(-M_PI/2, { 0.f, 0.f, 1.f });
-            myEngine.mvMatrixStack.addTranslation({ 0.f, 30.f, 0.f });
-            myEngine.mvMatrixStack.addHomothety({ 40.f, 60.f, 0.f });
-            myEngine.updateMvMatrix();  
-            trapeze.drawShape();
-        myEngine.mvMatrixStack.popMatrix();
-
-        myEngine.mvMatrixStack.pushMatrix();
-            myEngine.mvMatrixStack.addTranslation({ 60.f, 0.f, 0.f });
-            myEngine.mvMatrixStack.addHomothety({ 10.f, 10.f, 1.f });
-            myEngine.updateMvMatrix();
-            cercle.changeNature(GL_TRIANGLE_FAN);
-            cercle.drawShape();
-        myEngine.mvMatrixStack.popMatrix();
+    myEngine.mvMatrixStack.pushMatrix();
+        myEngine.mvMatrixStack.addTranslation({ 60.f, 0.f, 0.f });
+        myEngine.mvMatrixStack.addHomothety({ 10.f, 10.f, 1.f });
+        myEngine.updateMvMatrix();
+        cercle.changeNature(GL_TRIANGLE_FAN);
+        cercle.drawShape();
     myEngine.mvMatrixStack.popMatrix();
 }
 
@@ -194,8 +191,7 @@ void drawThirdArm() {
     myEngine.mvMatrixStack.pushMatrix();
         myEngine.mvMatrixStack.addHomothety({ 6.f, 6.f, 1.f });
         myEngine.updateMvMatrix();
-        carre.changeNature(GL_TRIANGLE_FAN);
-        carre.drawShape();
+        drawRoundedSquare();
     myEngine.mvMatrixStack.popMatrix();    
 
     myEngine.setFlatColor(0.f, 0.f, 0.f);
@@ -224,6 +220,54 @@ void renderScene() {
         drawFirstArm();
     
         myEngine.mvMatrixStack.pushMatrix();
+            myEngine.mvMatrixStack.addTranslation({ 60.f, 0.f, 0.f });
+            myEngine.mvMatrixStack.addRotation(beta,{ 0.f, 0.f, 1.f });
+            myEngine.updateMvMatrix();
+            drawSecondArm();
+
+            myEngine.mvMatrixStack.pushMatrix();
+                myEngine.mvMatrixStack.addTranslation({ 40.f, 0.f, 0.f });
+                myEngine.mvMatrixStack.pushMatrix();
+                    // myEngine.mvMatrixStack.addRotation(gamma,{ 0.f, 0.f, 1.f });
+                    myEngine.updateMvMatrix();
+                    drawThirdArm();
+
+                myEngine.mvMatrixStack.popMatrix();
+                myEngine.mvMatrixStack.pushMatrix();
+                    myEngine.mvMatrixStack.addRotation(M_PI/4,{ 0.f, 0.f, 1.f });
+                    myEngine.updateMvMatrix();
+                    drawThirdArm();
+                myEngine.mvMatrixStack.popMatrix();
+                myEngine.mvMatrixStack.pushMatrix();
+                    myEngine.mvMatrixStack.addRotation(-M_PI/4,{ 0.f, 0.f, 1.f });
+                    myEngine.updateMvMatrix();
+                    drawThirdArm();
+                myEngine.mvMatrixStack.popMatrix();
+            myEngine.mvMatrixStack.popMatrix();
+        myEngine.mvMatrixStack.popMatrix();
+    myEngine.mvMatrixStack.popMatrix();
+}
+
+void mouse_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        beta += M_PI/36;
+    }
+    if(button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        beta -= M_PI/36;
+    }
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    const char* keyName = glfwGetKeyName(key, scancode);
+
+    if (action == GLFW_PRESS && keyName[0] == 'f') {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    if (action == GLFW_PRESS && keyName[0] == 'p') {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 }
 
 int main()
@@ -238,13 +282,15 @@ int main()
     glfwSetErrorCallback(onError);
 
     // Create a windowed mode window and its OpenGL context
-    GLFWwindow *window = glfwCreateWindow(800, 800, "TD 03 Ex 01", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(800, 800, "TD 03 Ex 02", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
     glfwSetWindowSizeCallback(window, onWindowResized);
+    glfwSetMouseButtonCallback(window, mouse_callback);
+    glfwSetKeyCallback(window, key_callback);
     
     // Make the window's context current
     glfwMakeContextCurrent(window);
@@ -268,6 +314,15 @@ int main()
     {
         /* Get time (in second) at loop beginning */
         double startTime = glfwGetTime();
+
+        alpha += alphaSpeed;
+        if (alpha > M_PI / 4) { // +45° en radians
+            alpha = M_PI / 4;
+            alphaSpeed = -alphaSpeed; // Inverser la direction
+        } else if (alpha < -M_PI / 4) { // -45° en radians
+            alpha = -M_PI / 4;
+            alphaSpeed = -alphaSpeed; // Inverser la direction
+        }
 
         /* Render here */
         glClearColor(0.2f, 0.f, 0.f, 0.f);
